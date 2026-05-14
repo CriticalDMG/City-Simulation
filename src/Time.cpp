@@ -1,6 +1,6 @@
 #include "..\incl\Time.h"
 
-Time::Time():time(clock::to_time_t(clock::now())) {}
+Time::Time():time(clock::to_time_t(clock::now())), startTime(time) {}
 
 void Time::advance(size_t days)
 {
@@ -15,4 +15,11 @@ Time& Time::obj()
 {
     static Time t;
     return t;
+}
+
+int Time::GetDay() const
+{
+    std::tm* timeStruct = std::localtime(&time);
+    
+    return timeStruct->tm_mday;
 }
