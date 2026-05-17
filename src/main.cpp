@@ -1,12 +1,10 @@
 #include "..\\incl\\Time.h"
 #include "..\\incl\\building.h"
+#include "..\\Logger\\logger.h"
 
 int main()
 {
-    Modern* mod = new Modern();
-    uniquePointer<Building> b(new Building(49, 49, mod, 50));
-
-    std::cout << b;
+    AUTO_LOG();
+    Logger::GetInstance();
     return 0;
 }
-

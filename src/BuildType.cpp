@@ -1,15 +1,18 @@
 #include "..\incl\BuildType.h"
+#include "..\\Logger\\logger.h"
 #include <cmath>
 
 double dist(int x1, int y1, int x2, int y2)
 {
+    AUTO_LOG();
     return ((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
 }
 
-BuildType::BuildType(size_t rent): baseRent(rent) {}
+BuildType::BuildType(size_t rent): baseRent(rent) { AUTO_LOG(); }
 
 size_t BuildType::calcRent(const Location& loc, int rows, int cols) const
 {
+    AUTO_LOG();
     double finalRent = this->baseRent;
 
     double distance = sqrt(dist(loc.row, loc.col, rows / 2, cols / 2));

@@ -7,30 +7,30 @@
 
 #include <string>
 #include "proffesion.h"
-#include "building.h"
 #include "uniquePointer.h"
 #include "Time.h"
 
 class Citizen
 {
 public:
-    Citizen(std::string name, Proffesion* pr, Building& b);
+    Citizen(std::string name, Proffesion* pr);
 
-    void simulate();
+    void simulate(int owe);
     
     int happiness() const { return happ; }
     int GetLife() const { return life; }
 
-    size_t cash() const { return money; }
+    size_t balance() const { return money; }
     size_t salary() const { return proff->salary(); }
 
-    const Building& GetHome() const { return home; }
     const char* proffesion() const  { return proff->GetProff(); }
 
     const std::string& GetName() const { return name; }
 
 private:
-    void payRent();
+    static void incrementCounter();
+
+    void payRent(int owe);
     void buyFood();
 
 private:
@@ -38,10 +38,11 @@ private:
     int life;
 
     uniquePointer<Proffesion> proff;
-    Building& home;
     
+    static size_t inst;
     size_t money;
     std::string name;
 };
 
+std::ostream& operator<<(std::ostream& os, const Citizen& s);
 #endif //CITIZEN_H
