@@ -10,7 +10,7 @@ class Citizen;
 class Building
 {
 public:
-    Building(int n, int m, BuildType* type, size_t max);
+    Building(int n, int m, BuildType* type, unsigned int max);
     
     /*
         other ctors not needed cause the compiler will generate will
@@ -24,17 +24,19 @@ public:
 
     int row() const { return loc.row; }
     int col() const { return loc.col; }
-    const BuildType* GetType() const { return type.get(); }
-    size_t GetRent() const { return rent; }
+    
+    BuildingType GetType() const { return type->GetType(); }
+    unsigned int GetRent() const { return rent; }
+
     const std::vector<Citizen>& GetPpl() const { return ppl; }
-    size_t max() const { return MaxCitCount; }
+    unsigned int maxCitizens() const { return MaxCitCount; }
 
 private:
     Location loc;
     uniquePointer<BuildType> type;
-    size_t rent;
+    unsigned int rent;
 
-    size_t MaxCitCount;
+    unsigned int MaxCitCount;
     std::vector<Citizen> ppl;
 };
 
@@ -44,8 +46,8 @@ inline std::ostream& operator<<(std::ostream& os, const Building& obj)
     os << obj.GetRent() << " " 
        << obj.row() << " " 
        << obj.col() << " " 
-       << obj.max() << " "
-       << obj.GetType()->GetType();
+       << obj.maxCitizens() << " "
+       << obj.GetType();
 
     const std::vector<Citizen>& ppl = obj.GetPpl();
     for(size_t i = 0; i < ppl.size(); ++i)

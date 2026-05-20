@@ -8,9 +8,9 @@ double dist(int x1, int y1, int x2, int y2)
     return ((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
 }
 
-BuildType::BuildType(size_t rent): baseRent(rent) { AUTO_LOG(); }
+BuildType::BuildType(unsigned int rent): baseRent(rent) { AUTO_LOG(); }
 
-size_t BuildType::calcRent(const Location& loc, int rows, int cols) const
+unsigned int BuildType::calcRent(const Location& loc, int rows, int cols) const
 {
     AUTO_LOG();
     double finalRent = this->baseRent;
@@ -27,6 +27,6 @@ size_t BuildType::calcRent(const Location& loc, int rows, int cols) const
         finalRent *= 0.8;
     }
 
-    return static_cast<size_t>(finalRent);
+    return static_cast<unsigned int>(finalRent);
 }
 

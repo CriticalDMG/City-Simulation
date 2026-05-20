@@ -2,72 +2,99 @@
 #define PROFFESTION_H
 #include <iostream>
 
+enum ProffType
+{
+    UNKNOWN = -1,
+    TEACHER,
+    PROGRAMMER,
+    MINER,
+    STUDENT,
+    UNEMPLOYED
+};
+
 class Proffesion
 {
 public:
-    Proffesion(size_t sal): wage(sal) {}
+    Proffesion(unsigned int sal): wage(sal) {}
 
     virtual void CalcHappiness(int& happ) const {}
     virtual void CalcLife(int& life) const {}
 
-    virtual const char* GetProff() const = 0;
+    virtual ProffType GetProff() const = 0;
 
-    size_t salary() const { return wage; }
+    unsigned int salary() const { return wage; }
 protected:
-    static unsigned int chooseSalary(int min, int max);
 
 private:
-    size_t wage;
+    unsigned int wage;
 };
 
 class Teacher: public Proffesion
 {
 public:
-    Teacher():Proffesion(Proffesion::chooseSalary(1200, 1300)) {}
+    Teacher(unsigned int sal):Proffesion(sal) 
+    {
+        if(sal < 1200 || sal > 1300) 
+            throw std::invalid_argument("Teacher salary should be betwenn 1200 and 1300");
+    }
 
     virtual void CalcHappiness(int& happ) const override;
 
-    virtual const char* GetProff() const override { return "Teacher"; }
+    virtual ProffType GetProff() const override { return TEACHER; }
 };
 
 class Programmer: public Proffesion
 {
 public:
-    Programmer(): Proffesion(Proffesion::chooseSalary(2000, 5000)) {}
+    Programmer(unsigned int sal): Proffesion(sal) 
+    {
+        if(sal < 2000 || sal > 5000) 
+            throw std::invalid_argument("Teacher salary should be betwenn 2000 and 5000");
+    }
 
     virtual void CalcHappiness(int& happ) const override;
 
-    virtual const char* GetProff() const override { return "Programmer"; }
+    virtual ProffType GetProff() const override { return PROGRAMMER; }
 };
 
 class Miner: public Proffesion
 {
-    Miner():Proffesion(Proffesion::chooseSalary(1000, 3000)) {}
+    Miner(unsigned int sal):Proffesion(sal) 
+    {
+        if(sal < 1000 || sal > 3000) 
+            throw std::invalid_argument("Teacher salary should be betwenn 1000 and 3000");
+    }
 
     virtual void CalcLife(int& life) const override;    
 
-    virtual const char* GetProff() const override { return "Miner"; }
+    virtual ProffType GetProff() const override { return MINER; }
 };
 
 class Student: public Proffesion
 {
 public:
-    Student():Proffesion(0) {}
+    Student(unsigned int sal):Proffesion(sal) 
+    {
+        if(sal != 0) throw std::invalid_argument("Student salary should be 0");
+    }
 
     virtual void CalcHappiness(int& happ) const override;
 
-    virtual const char* GetProff() const override { return "Student"; }
+    virtual ProffType GetProff() const override { return STUDENT; }
 };
 
-class Jobless: public Proffesion
+class Unemployed: public Proffesion
 {
 public:
-    Jobless():Proffesion(0) {}
+    Unemployed(unsigned int sal):Proffesion(sal) 
+    {
+        throw std::invalid_argument("Unemployed salary should be 0");
+    }
 
     virtual void CalcLife(int& life) const override;    
     virtual void CalcHappiness(int& happ) const override;
     
-    virtual const char* GetProff() const override { return "Jobless"; }
+    virtual ProffType GetProff() const override { return UNEMPLOYED; }
 };
 
 #endif //PROFFESTION_H

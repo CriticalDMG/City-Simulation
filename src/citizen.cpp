@@ -2,19 +2,19 @@
 #include "..\\Logger\\logger.h"
 #include <cstring>
 
-size_t Citizen::inst = 0;
-
-Citizen::Citizen(std::string name, Proffesion* pr)
-:happ(MAXHAPPINESS), life(MAXLIFE), 
- proff(pr), money(proff->salary()),
+Citizen::Citizen(std::string name, Proffesion* pr, 
+                 int happiness, int life,BuildingType type)
+:happ(happiness), life(life), 
+ proff(pr), money(pr->salary()),
  name(std::move(name)) 
 {
     AUTO_LOG();
-    if(strcmp(proffesion(), "Dorm") == 0 && 
-       strcmp(proffesion(), "Student") != 0)
-            throw std::invalid_argument("Citizen is not a student, so he cannot live in a dorm!"); 
+    if(happiness < 0 || happiness > 100 || life < 0 || life > 100)
+        throw std::invalid_argument("life and happiness should be between 0 and 100"); 
     
-    incrementCounter();
+
+    if(type == DORM && proffesion() == STUDENT)
+        throw std::invalid_argument("Citizen is not a student, so he cannot live in a dorm!"); 
 }
 
 void Citizen::simulate(int owe)
@@ -49,7 +49,7 @@ void Citizen::payRent(int owe)
 void Citizen::buyFood()
 {
     AUTO_LOG();
-    if(money < FOOD || strcmp(proffesion(), "Jobless") == 0 || strcmp(proffesion(), "Student") == 0)
+    if(money < FOOD || proffesion() == UNEMPLOYED || proffesion() == STUDENT)
     {
         happ = std::max(0, happ - 2);
         life = std::max(0, life - 1);
@@ -58,7 +58,6 @@ void Citizen::buyFood()
 
     money -= FOOD;
 }
-
 
 std::ostream& operator<<(std::ostream& os, const Citizen& s)
 {

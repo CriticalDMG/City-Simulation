@@ -2,6 +2,14 @@
 #define BUILDTYPE_H
 #include "uniquePointer.h"
 
+enum BuildingType
+{
+    UNKNOWN = -1,
+    MODERN,
+    PANEL,
+    DORM
+};
+
 //packets the location of the building
 struct Location
 {
@@ -18,38 +26,38 @@ class BuildType
 {
 public:
     virtual ~BuildType() = default;  
-    BuildType(size_t rent);
+    BuildType(unsigned int rent);
 
     //location packets the coordinates of the building
     //rows and cols are the size of the matrix
-    virtual size_t calcRent(const Location& loc, int rows, int cols) const;
-    virtual const char* GetType() const = 0;
+    virtual unsigned int calcRent(const Location& loc, int rows, int cols) const;
+    virtual BuildingType GetType() const = 0;
 protected:
    
 
 private:
-    size_t baseRent;
+    unsigned int baseRent;
 };
 
 class Modern: public BuildType
 {
 public:
     Modern(): BuildType(1000) {}
-    virtual const char* GetType() const override { return "Modern"; }
+    virtual BuildingType GetType() const override { return MODERN; }
 };
 
 class Panel: public BuildType
 {
 public:
     Panel(): BuildType(500) {}
-    virtual const char* GetType() const override { return "Panel"; }
+    virtual BuildingType GetType() const override { return PANEL; }
 };
 
 class Dorm: public BuildType
 {
 public:
     Dorm(): BuildType(67) {}
-    virtual const char* GetType() const override { return "Dormitory"; }
+    virtual BuildingType GetType() const override { return DORM; }
 };
 
 #endif //BUILDTYPE_H
