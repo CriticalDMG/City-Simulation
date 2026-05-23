@@ -4,7 +4,7 @@
 
 enum BuildingType
 {
-    UNKNOWN = -1,
+    BUILDIGNTYPE_UNKNOWN = -1,
     MODERN,
     PANEL,
     DORM
@@ -32,9 +32,6 @@ public:
     //rows and cols are the size of the matrix
     virtual unsigned int calcRent(const Location& loc, int rows, int cols) const;
     virtual BuildingType GetType() const = 0;
-protected:
-   
-
 private:
     unsigned int baseRent;
 };

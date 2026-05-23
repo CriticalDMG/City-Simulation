@@ -27,3 +27,22 @@ void Building::removePerson(const std::string& name)
         }
     }
 }
+
+std::ostream& operator<<(std::ostream& os, const Building& obj)
+{
+    AUTO_LOG();
+    os << obj.GetRent() << " " 
+       << obj.row() << " " 
+       << obj.col() << " " 
+       << obj.maxCitizens() << " "
+       << obj.GetType();
+
+    const std::vector<Citizen>& ppl = obj.GetPpl();
+    for(size_t i = 0; i < ppl.size(); ++i)
+    {
+        os << ppl[i];
+    }
+    os << "\n";
+
+    return os;
+}

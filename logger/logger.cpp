@@ -2,7 +2,7 @@
 
 Logger::Logger()
 {
-    logFile.open("D:\\Projects\\City-Simulation\\logs\\log.txt", std::ios::app);
+    logFile.open("log.txt", std::ios::app);
     if(!logFile.is_open()) throw std::runtime_error("Couldnt open log file!");
     logFile << "---New run---\n";
 }

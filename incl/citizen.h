@@ -11,30 +11,41 @@
 class Citizen
 {
 public:
-    Citizen(std::string name, Proffesion* pr, int happiness, int life, BuildingType type);
+    Citizen(std::string name, Proffesion* pr,
+            int happiness, int life, unsigned int startMoney,
+            int creationDay, BuildingType type);
 
+    void updateStatistics(int currDay, int toPay);
 
-    void payRent(int owe);
-    void buyFood();
-    void simulate(int owe);
+    unsigned int happiness() const { return happ; }
+    unsigned int startappiness() const { return startHapp; }
 
-    int happiness() const { return happ; }
-    int GetLife() const { return life; }
-
+    unsigned int GetLife() const { return life; }
+    unsigned int StartLife() const { return startLife; }
+ 
     unsigned int balance() const { return money; }
     unsigned int salary() const { return proff->salary(); }
+    unsigned int getStartMoney() const { return startMoney; }
 
+    int creation() const { return creationDay; }
     ProffType proffesion() const  { return proff->GetProff(); }
 
     const std::string& GetName() const { return name; }
 
 private:
-    int happ;
-    int life;
+    unsigned int happ        :7;
+    unsigned int startHapp   :7;
+
+    unsigned int life        :7;
+    unsigned int startLife   :7;
+
+    unsigned int money;
+    unsigned int startMoney;
+
+    int creationDay;
 
     uniquePointer<Proffesion> proff;
     
-    unsigned int money;
     std::string name;
 };
 

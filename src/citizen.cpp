@@ -3,10 +3,12 @@
 #include <cstring>
 
 Citizen::Citizen(std::string name, Proffesion* pr, 
-                 int happiness, int life,BuildingType type)
-:happ(happiness), life(life), 
- proff(pr), money(pr->salary()),
- name(std::move(name)) 
+                 int happiness, int life, unsigned int startMoney,
+                 int creationDay, BuildingType type)
+: happ(happiness), startHapp(happ),
+  life(life), startLife(life),
+  money(startMoney), startMoney(startMoney),
+  creationDay(creationDay), proff(pr), name(std::move(name))
 {
     AUTO_LOG();
     if(happiness < 0 || happiness > 100 || life < 0 || life > 100)
@@ -17,56 +19,58 @@ Citizen::Citizen(std::string name, Proffesion* pr,
         throw std::invalid_argument("Citizen is not a student, so he cannot live in a dorm!"); 
 }
 
-void Citizen::simulate(int owe)
+void Citizen::updateStatistics(int currDay, int toPay)
 {
     AUTO_LOG();
-    if(Time::obj().GetDay() == 1)
-    {
-        money += salary();
-        proff->CalcHappiness(happ);
-        proff->CalcLife(life);
-        
-        payRent(owe);
-    }
 
-    buyFood();
-}
+    int lived = currDay - creationDay;
 
-void Citizen::payRent(int owe)
-{
-    AUTO_LOG();
-    if(money < owe)
+    if(lived <= 0)
     {
-        happ = std::max(0, happ - 3);
-        life = std::max(0, life - 2);
-    }
-    else
-    {
-        money -= owe;
-    }
-}
-
-void Citizen::buyFood()
-{
-    AUTO_LOG();
-    if(money < FOOD || proffesion() == UNEMPLOYED || proffesion() == STUDENT)
-    {
-        happ = std::max(0, happ - 2);
-        life = std::max(0, life - 1);
+        money = startMoney;
+        life = startLife;
+        happ = startHapp;
         return;
     }
 
-    money -= FOOD;
+    int month = Time::obj().GetPassedMonths(creationDay, currDay);
+
+    long long virtualMoney = startMoney + month * salary() - (month * toPay) - (lived * FOOD);
+    long long deficit = 0;
+
+    if(virtualMoney <= 0)
+    {
+        money = 0;
+        deficit = -virtualMoney;
+    }
+    else
+    {
+        money = virtualMoney;
+    }
+
+    int penalty = deficit / FOOD;
+
+    int baseHappiness = proff->CalcHappiness(startHapp, month);
+    int baseLife = proff->CalcLife(startLife, month);
+
+    happ = std::max(0, baseHappiness - (penalty * 2));
+    life = std::max(0, baseLife - (penalty * 1));
+
+    if(life <= 0)
+    {
+        happ = 0;
+        money = 0;
+    }
 }
 
 std::ostream& operator<<(std::ostream& os, const Citizen& s)
 {
     AUTO_LOG();
     os << "\n";
-    os << s.GetName() << " "
-       << s.GetLife() << " "
-       << s.happiness() << " "
-       << s.proffesion() << " "
-       << s.balance(); 
+    os << "Name: " << s.GetName() << "\n"
+       << "Life: " << s.GetLife() << "\n"
+       << "Happiness: " << s.happiness() << "\n"
+       << "Proffesion: " << s.proffesion() << "\n"
+       << "Balance: " << s.balance() << "\n"; 
     return os;
 }

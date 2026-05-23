@@ -31,6 +31,13 @@ public:
     const std::vector<Citizen>& GetPpl() const { return ppl; }
     unsigned int maxCitizens() const { return MaxCitCount; }
 
+    const Citizen& operator[](size_t index) const {
+        return ppl[index];
+    }
+
+    Citizen& operator[](size_t index) {
+        return ppl[index];
+    }
 private:
     Location loc;
     uniquePointer<BuildType> type;
@@ -40,23 +47,6 @@ private:
     std::vector<Citizen> ppl;
 };
 
-inline std::ostream& operator<<(std::ostream& os, const Building& obj)
-{
-    AUTO_LOG();
-    os << obj.GetRent() << " " 
-       << obj.row() << " " 
-       << obj.col() << " " 
-       << obj.maxCitizens() << " "
-       << obj.GetType();
-
-    const std::vector<Citizen>& ppl = obj.GetPpl();
-    for(size_t i = 0; i < ppl.size(); ++i)
-    {
-        os << ppl[i];
-    }
-    os << "\n";
-
-    return os;
-}
+std::ostream& operator<<(std::ostream& os, const Building& obj);
 
 #endif //BUILDING_H

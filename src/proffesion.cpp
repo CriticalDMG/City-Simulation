@@ -4,38 +4,38 @@
 #include <cstdlib>
 #include <ctime>
 
-void Teacher::CalcHappiness(int& happ) const 
+int Teacher::CalcHappiness(int happ, int monthsAdv) const 
 {
     AUTO_LOG();
-    happ = std::max(happ + 1, 100);   
+    return std::min(100, happ + monthsAdv);
 }
 
-void Programmer::CalcHappiness(int& happ) const
+int Programmer::CalcHappiness(int happ, int monthsAdv) const
 {
     AUTO_LOG();
-    happ = std::max(0, happ - 1);
+    return std::max(0, happ - monthsAdv);
 }
 
-void Miner::CalcLife(int& life) const
+int Miner::CalcLife(int life, int monthsAdv) const
 {
     AUTO_LOG();
-    life = std::max(0, life - 2);
+    return std::max(0, life - (2 * monthsAdv));
 } 
 
-void Student::CalcHappiness(int& happ) const
+int Student::CalcHappiness(int happ, int monthsAdv) const
 {
     AUTO_LOG();
-    happ = std::max(0, happ - 1);
+    return std::max(0, happ - monthsAdv);
 }
 
-void Unemployed::CalcLife(int& life) const
+int Unemployed::CalcLife(int life, int monthsAdv) const
 {
     AUTO_LOG();
-    life = std::max(0, life - 1);
+    return std::max(0, life - monthsAdv);
 }
 
-void Unemployed::CalcHappiness(int& happ) const 
+int Unemployed::CalcHappiness(int happ, int monthsAdv) const 
 {
     AUTO_LOG();
-    happ = std::max(0, happ - 1);
+    return std::max(0, happ - monthsAdv);
 }

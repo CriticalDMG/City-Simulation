@@ -4,7 +4,7 @@
 
 enum ProffType
 {
-    UNKNOWN = -1,
+    PROFFTYPE_UNKNOWN = -1,
     TEACHER,
     PROGRAMMER,
     MINER,
@@ -17,8 +17,8 @@ class Proffesion
 public:
     Proffesion(unsigned int sal): wage(sal) {}
 
-    virtual void CalcHappiness(int& happ) const {}
-    virtual void CalcLife(int& life) const {}
+    virtual int CalcHappiness(int happ, int monthsAdv) const { return happ; }
+    virtual int CalcLife(int life, int monthsAdv) const { return life; }
 
     virtual ProffType GetProff() const = 0;
 
@@ -38,7 +38,7 @@ public:
             throw std::invalid_argument("Teacher salary should be betwenn 1200 and 1300");
     }
 
-    virtual void CalcHappiness(int& happ) const override;
+    virtual int CalcHappiness(int happ, int monthsAdv) const override;
 
     virtual ProffType GetProff() const override { return TEACHER; }
 };
@@ -52,20 +52,21 @@ public:
             throw std::invalid_argument("Teacher salary should be betwenn 2000 and 5000");
     }
 
-    virtual void CalcHappiness(int& happ) const override;
+    virtual int CalcHappiness(int happ, int monthsAdv) const override;
 
     virtual ProffType GetProff() const override { return PROGRAMMER; }
 };
 
 class Miner: public Proffesion
 {
+public:
     Miner(unsigned int sal):Proffesion(sal) 
     {
         if(sal < 1000 || sal > 3000) 
             throw std::invalid_argument("Teacher salary should be betwenn 1000 and 3000");
     }
 
-    virtual void CalcLife(int& life) const override;    
+    virtual int CalcLife(int life, int monthsAdv) const override;    
 
     virtual ProffType GetProff() const override { return MINER; }
 };
@@ -78,7 +79,7 @@ public:
         if(sal != 0) throw std::invalid_argument("Student salary should be 0");
     }
 
-    virtual void CalcHappiness(int& happ) const override;
+    virtual int CalcHappiness(int happ, int monthsAdv) const override;
 
     virtual ProffType GetProff() const override { return STUDENT; }
 };
@@ -91,9 +92,8 @@ public:
         throw std::invalid_argument("Unemployed salary should be 0");
     }
 
-    virtual void CalcLife(int& life) const override;    
-    virtual void CalcHappiness(int& happ) const override;
-    
+    virtual int CalcLife(int life, int monthsAdv) const override;    
+    virtual int CalcHappiness(int happ, int monthsAdv) const override;    
     virtual ProffType GetProff() const override { return UNEMPLOYED; }
 };
 
