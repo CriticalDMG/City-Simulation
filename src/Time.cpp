@@ -4,7 +4,7 @@
 
 Time::Time():time(clock::to_time_t(clock::now())), startTime(time) { AUTO_LOG(); }
 
-void Time::advance(size_t days)
+void Time::advance(int days)
 {
     AUTO_LOG();
     time += (days * SINGLEDAY);

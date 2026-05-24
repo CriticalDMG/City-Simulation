@@ -10,7 +10,7 @@ public:
     using clock = std::chrono::system_clock;
 
     static Time& obj();
-    void advance(size_t days = 1);
+    void advance(int days = 1);
     int GetDay() const;
     int GetPassedMonths(int startAbsoluteDay, int currAbsoluteDay) const;
 

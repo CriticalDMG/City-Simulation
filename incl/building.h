@@ -38,6 +38,7 @@ public:
     Citizen& operator[](size_t index) {
         return ppl[index];
     }
+
 private:
     Location loc;
     uniquePointer<BuildType> type;

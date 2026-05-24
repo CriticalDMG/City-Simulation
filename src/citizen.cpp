@@ -15,7 +15,7 @@ Citizen::Citizen(std::string name, Proffesion* pr,
         throw std::invalid_argument("life and happiness should be between 0 and 100"); 
     
 
-    if(type == DORM && proffesion() == STUDENT)
+    if(type == DORM && proffesion() != STUDENT)
         throw std::invalid_argument("Citizen is not a student, so he cannot live in a dorm!"); 
 }
 

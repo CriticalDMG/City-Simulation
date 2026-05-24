@@ -89,7 +89,8 @@ class Unemployed: public Proffesion
 public:
     Unemployed(unsigned int sal):Proffesion(sal) 
     {
-        throw std::invalid_argument("Unemployed salary should be 0");
+        if(sal != 0)
+            throw std::invalid_argument("Unemployed salary should be 0");
     }
 
     virtual int CalcLife(int life, int monthsAdv) const override;    
