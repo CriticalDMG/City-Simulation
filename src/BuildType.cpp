@@ -8,14 +8,15 @@ double dist(int x1, int y1, int x2, int y2)
     return ((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
 }
 
-BuildType::BuildType(unsigned int rent): baseRent(rent) { AUTO_LOG(); }
-
-unsigned int BuildType::calcRent(const Location& loc, int rows, int cols) const
+unsigned int BuildType::calcRent(int row, int col, int rows, int cols) const
 {
     AUTO_LOG();
-    double finalRent = this->baseRent;
+    double finalRent = this->getBaseRent();
 
-    double distance = sqrt(dist(loc.row, loc.col, rows / 2, cols / 2));
+    double centerX = rows / 2.0; 
+    double centerY = cols / 2.0;
+
+    double distance = sqrt(dist(centerX, centerY, row, col));    
     double min = std::min(rows, cols);
 
     if(distance <= min / 8.0)
@@ -29,4 +30,3 @@ unsigned int BuildType::calcRent(const Location& loc, int rows, int cols) const
 
     return static_cast<unsigned int>(finalRent);
 }
-

@@ -1,41 +1,43 @@
 #include "..\incl\building.h"
 #include "..\\Logger\\logger.h"
+#include "..\\incl\\helpers.h"
 
-
-Building::Building(int n, int m, BuildType* type, unsigned int max)
-:loc(n, m), type(type), rent(type->calcRent(loc, 100, 100)), MaxCitCount(max), ppl() { AUTO_LOG(); }
-
-bool Building::addPerson(Citizen person)
-{
-    AUTO_LOG();
-    if(ppl.size()>= MaxCitCount) return false;
-
-    ppl.push_back(std::move(person));
-
-    return true;
+Building::Building(int row, int col, int matrixRows, int matrixCols, 
+                   const BuildType* type, unsigned int max)
+: id(row * matrixCols + col), type(type), 
+rent(type->calcRent(row, col, matrixRows, matrixCols)), 
+MaxCitCount(max), ppl{} 
+{ 
+    AUTO_LOG(); 
 }
 
-void Building::removePerson(const std::string& name)
+Building::Building(const BuildingPack& input, const BuildType* type)
+:id(input.id), type(type), 
+ rent(input.rent), MaxCitCount(input.maxCitCount),
+ ppl{} {}
+
+Building::operator BuildingPack() const
 {
-    AUTO_LOG();
-    for (auto it = ppl.begin(); it != ppl.end(); ++it)
-    {
-        if (it->GetName() == name) 
-        {
-            ppl.erase(it);
-            break; 
-        }
-    }
+    BuildingPack pack;
+
+    pack.id = id;
+    pack.rent = rent;
+    pack.type = type->GetType();
+    pack.maxCitCount = MaxCitCount;
+
+    pack.LastResOffset = 0;
+
+    return pack;
 }
 
 std::ostream& operator<<(std::ostream& os, const Building& obj)
 {
     AUTO_LOG();
+
     os << obj.GetRent() << " " 
-       << obj.row() << " " 
-       << obj.col() << " " 
+       << obj.GetId() << " " 
        << obj.maxCitizens() << " "
-       << obj.GetType();
+       << helpers::ToBuildingType(obj.GetType());
 
     const std::vector<Citizen>& ppl = obj.GetPpl();
     for(size_t i = 0; i < ppl.size(); ++i)

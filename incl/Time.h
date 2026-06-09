@@ -3,6 +3,7 @@
 #include <iostream>
 #include <chrono>
 #include <ctime>
+#include "helpers.h"
 
 class Time
 {
@@ -16,8 +17,20 @@ public:
 
     std::string GetCurrentTime() const 
     { 
-        std::string str = std::ctime(&time);
-        str.pop_back();
+        char* timeStr = std::ctime(&time);
+        
+        if(!timeStr)
+        {
+            LOG_ERROR(ERROR_CODES::INVALID_TIME_CONVERSION);
+            throw (int)ERROR_CODES::INVALID_TIME_CONVERSION;
+        }
+
+        std::string str(timeStr);
+        if (!str.empty() && str.back() == '\n') 
+        {
+            str.pop_back(); 
+        }
+
         return str;
     }
 
@@ -27,6 +40,7 @@ public:
         str.pop_back();
         return str;
     }
+
 private:
     Time();
     Time(const Time&) = delete;
@@ -34,7 +48,6 @@ private:
 
     std::time_t time;
     std::time_t startTime;
-    
 };
 inline std::ostream& operator<<(std::ostream& os, const Time& t)
 {

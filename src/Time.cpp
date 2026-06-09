@@ -1,18 +1,19 @@
 #include "..\incl\Time.h"
 #include "..\\Logger\\logger.h"
-#define SINGLEDAY 86400LL
 
 Time::Time():time(clock::to_time_t(clock::now())), startTime(time) { AUTO_LOG(); }
 
 void Time::advance(int days)
 {
     AUTO_LOG();
+
     time += (days * SINGLEDAY);
 }
 
 Time& Time::obj()
 {
     AUTO_LOG();
+
     static Time t;
     return t;
 }

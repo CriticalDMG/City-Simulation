@@ -1,52 +1,64 @@
 #ifndef CITIZEN_H
 #define CITIZEN_H
-#define FOOD 50
 
 #include <string>
+#include "BuildType.h"
 #include "proffesion.h"
-#include "uniquePointer.h"
-#include "building.h"
 #include "Time.h"
 
 class Citizen
-{
+{    
 public:
-    Citizen(std::string name, Proffesion* pr,
-            int happiness, int life, unsigned int startMoney,
-            int creationDay, BuildingType type);
+    Citizen(std::string name, const Proffesion* pr, 
+                 int happiness, int life, unsigned int startMoney, 
+                 int creationDay, unsigned int buildingId, BuildingType type);
 
-    void updateStatistics(int currDay, int toPay);
+    explicit Citizen(const CitizenPack& obj, 
+                     std::string name, 
+                     const Proffesion* proff,
+                     int rent);
+
+    explicit operator CitizenPack() const;
+
+    void updateStatistics(int currDay, int rent);
+
+    unsigned int GetSalary() const { return salary; }
+    unsigned int balance() const { return money; }
+    unsigned int GetStartMoney() const { return startMoney; }
 
     unsigned int happiness() const { return happ; }
-    unsigned int startappiness() const { return startHapp; }
+    unsigned int startHappiness() const { return startHapp; }
 
     unsigned int GetLife() const { return life; }
     unsigned int StartLife() const { return startLife; }
- 
-    unsigned int balance() const { return money; }
-    unsigned int salary() const { return proff->salary(); }
-    unsigned int getStartMoney() const { return startMoney; }
 
     int creation() const { return creationDay; }
     ProffType proffesion() const  { return proff->GetProff(); }
 
     const std::string& GetName() const { return name; }
 
+    bool operator==(const Citizen& oth) const;
+    bool operator!=(const Citizen& oth) const;
+
 private:
+    int getDayOfDeath(int rent) const;
+private:
+    const Proffesion* proff;
+    std::string name;
+
     unsigned int happ        :7;
     unsigned int startHapp   :7;
 
     unsigned int life        :7;
     unsigned int startLife   :7;
 
-    unsigned int money;
+    unsigned int buildingId;
+
+    unsigned int salary;
     unsigned int startMoney;
+    unsigned int money;
 
     int creationDay;
-
-    uniquePointer<Proffesion> proff;
-    
-    std::string name;
 };
 
 std::ostream& operator<<(std::ostream& os, const Citizen& s);
