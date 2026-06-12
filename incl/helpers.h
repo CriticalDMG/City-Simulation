@@ -2,16 +2,16 @@
 #define HELPERS_H
 #include <fstream>
 #include "types.h"
+#include "citizen.h"
 
-
-#define SINGLEDAY 86400LL
-#define FOOD 50
 
 namespace helpers
 {
     void logError(ERROR_CODES::Type code, const char* func);
     const char* convertCode(ERROR_CODES::Type code);
     bool verify(std::fstream& stream, unsigned char code);
+    
+    int predictDayOfDeath(const Citizen& citizen, int rent, int currentDay);
 
     int calcSalary(int min, int max);
     const char* ToProffession(ProffType);

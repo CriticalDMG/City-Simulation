@@ -5,6 +5,8 @@
 
 int main()
 {
-    
-    return 0;
+    CitizenPack pack;
+
+    std::cout << pack.startHapp << pack.startLife;
+    return EXIT_SUCCESS;
 }

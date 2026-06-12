@@ -1,8 +1,4 @@
 #include "..\\incl\\helpers.h"
-#include "..\\incl\\proffesion.h"
-#include "..\\incl\\BuildType.h"
-#include <cstdlib>
-#include <ctime>
 
 void helpers::logError(ERROR_CODES::Type code, const char* func)
 {
@@ -99,4 +95,33 @@ const char* helpers::ToBuildingType(BuildingType type)
     }
 
     return nullptr;
+}
+
+int helpers::predictDayOfDeath(const Citizen& citizen, int rent, int currentDay)
+{
+    int left = currentDay;
+    int right = currentDay + 73000;
+
+    int remDay = -1;
+
+    while(left <= right)
+    {
+        int mid = left + (right - left) / 2;
+
+        Citizen temp = citizen; 
+        
+        temp.updateStatistics(mid, rent); 
+
+        if(temp.GetLife() == 0)
+        {
+            remDay = mid;       
+            right = mid - 1; 
+        }
+        else
+        {
+            left = mid + 1;    
+        }
+    }
+
+    return remDay;
 }

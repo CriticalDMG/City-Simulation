@@ -1,10 +1,14 @@
 #ifndef TYPES_H
 #define TYPES_H
-
 #include <iostream>
-#define BUILDING_FILENAME "..\\files\\buildings.bin"
+#include <ctime>
+
 #define STATS_COUNT 3
 #define CITY_SIG 0x43495459
+#define SINGLEDAY 86400LL
+#define FOOD 50
+
+using uint64_t = unsigned long long;
 
 namespace ERROR_CODES
 {
@@ -122,8 +126,8 @@ struct BuildingStats
 
         unsigned int buildingId{};
 
-        size_t prevCitOffset{};
-        size_t nameOffset{};
+        uint64_t prevCitOffset{};
+        uint64_t nameOffset{};
     };
 
     struct BuildingPack
@@ -135,7 +139,7 @@ struct BuildingStats
         int maxCitCount   :14{};
         int type          :4 {};
 
-        size_t LastResOffset{};
+        uint64_t LastResOffset{};
     };
 
 #pragma pack(pop)

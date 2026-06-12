@@ -51,7 +51,7 @@ Citizen::operator CitizenPack() const
     pack.proff = proffesion();
     pack.salary = salary;
 
-    pack.nameLen = name.length();
+    pack.nameLen = name.size();
     pack.startMoney = startMoney;
 
     pack.creationDay = creationDay;
@@ -137,30 +137,4 @@ std::ostream& operator<<(std::ostream& os, const Citizen& s)
     return os;
 }
 
-int Citizen::getDayOfDeath(int rent) const
-{
-    Citizen temp = *this;
 
-    int left = creationDay;
-    int right = creationDay + 73000;
-
-    int remDay = -1;
-
-    while(left <= right)
-    {
-        int mid = left - (right - left) / 2;
-
-        temp.updateStatistics(mid, rent);
-        if(temp.GetLife() == 0)
-        {
-            remDay = mid;
-            right = mid - 1;
-        }
-        else
-        {
-            left = mid + 1;
-        }
-    }
-
-    return remDay;
-}
