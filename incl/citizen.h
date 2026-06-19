@@ -2,9 +2,11 @@
 #define CITIZEN_H
 
 #include <string>
+#include <iostream>
+#include "time.h"
+#include "types.h"
 #include "BuildType.h"
 #include "proffesion.h"
-#include "Time.h"
 
 class Citizen
 {    

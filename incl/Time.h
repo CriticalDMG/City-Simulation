@@ -1,9 +1,12 @@
 #ifndef TIME_H
 #define TIME_H
+
 #include <iostream>
 #include <chrono>
 #include <ctime>
+#include <string>
 #include "helpers.h"
+#include "types.h"
 
 class Time
 {

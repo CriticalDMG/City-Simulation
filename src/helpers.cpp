@@ -1,4 +1,5 @@
 #include "..\\incl\\helpers.h"
+#include "..\\incl\\citizen.h"
 
 void helpers::logError(ERROR_CODES::Type code, const char* func)
 {

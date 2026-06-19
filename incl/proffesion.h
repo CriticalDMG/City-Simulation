@@ -1,7 +1,7 @@
 #ifndef PROFFESTION_H
 #define PROFFESTION_H
 #include <iostream>
-#include "helpers.h"
+#include "types.h"
 
 class Proffesion
 {

@@ -2,8 +2,8 @@
 #define HELPERS_H
 #include <fstream>
 #include "types.h"
-#include "citizen.h"
 
+class Citizen;
 
 namespace helpers
 {

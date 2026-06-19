@@ -1,6 +1,8 @@
 #ifndef PROFFESION_REGISTER_H
 #define PROFFESION_REGISTER_H
+
 #include "proffesion.h"
+#include "BuildType.h"
 #include "building.h"
 
 class ProffRegister

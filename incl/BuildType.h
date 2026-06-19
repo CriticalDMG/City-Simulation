@@ -1,6 +1,7 @@
 #ifndef BUILDTYPE_H
 #define BUILDTYPE_H
-#include "helpers.h"
+
+#include "types.h"
 /*
     This heirachy determines the type of the building(modern, panel, etc)
 */

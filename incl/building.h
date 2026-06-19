@@ -1,9 +1,12 @@
 #ifndef BUILDING_H
 #define BUILDING_H
+
+#include <vector>
+#include <iostream>
+#include "types.h"
 #include "BuildType.h"
 #include "citizen.h"
 #include "..\\Logger\\logger.h"
-#include <vector>
 
 class Building
 {

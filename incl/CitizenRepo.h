@@ -1,19 +1,13 @@
 #ifndef CITIZEN_REPO_H
 #define CITIZEN_REPO_H
-#include "building.h"
-
-class BuildingRepo
-{
-public:
-    BuildingPack& getBulding(unsigned int id);
-    void saveChanges(const BuildingPack& pack);
-
-};
+#include <fstream>
+#include "BuildingRepo.h"
+#include "proffesion.h"
 
 class CitizenRepo
 {
 public:
-    CitizenRepo();
+    friend class FileEngine;
     ~CitizenRepo() noexcept;
 
     size_t addCitizen(const char* name, const Proffesion* ptr, 
@@ -24,7 +18,7 @@ public:
     int readCitizenAt(uint64_t offset, CitizenPack& out);
     int removeCitizen(uint64_t offset, int currDay);
     
-    int loadCitizens(std::ifstream& in, BuildingRepo& repo);
+    int loadCitizens(std::ifstream& in, BuildingRepo& repo, int totalPeople);
     int saveCitizens(std::ofstream& out);
 
     class Iterator
@@ -51,13 +45,16 @@ public:
     Iterator begin(int currDay);
     Iterator end();
 private:
+    CitizenRepo();
+    CitizenRepo(CitizenRepo&&) noexcept;
+
     uint64_t encodeName(const char* str, size_t size);
     uint64_t encodeCitizen(CitizenPack& cit);
 
+private:
     static constexpr const char* CITIZEN_FILENAME = "..\\files\\citizen.bin";
     static constexpr const char* NAMES_FILENAME = "..\\files\\names.bin";
 
-private:
     std::fstream citizens;
     std::fstream names;
 };
