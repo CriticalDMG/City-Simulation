@@ -12,6 +12,7 @@ public:
     virtual ~BuildType() = default;
 
     virtual unsigned int getBaseRent() const = 0;
+    
     //matrixRows and matrixCols are the size of the matrix
     //row and col represent the location the building will be placeds
     virtual unsigned int calcRent(int row, int col, int rows, int cols) const;    virtual BuildingType GetType() const = 0;

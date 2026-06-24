@@ -4,23 +4,21 @@
 #include "BuildingRepo.h"
 #include "proffesion.h"
 
+//handles direct binary disk I/O operations for Citizens and their Names
 class CitizenRepo
 {
 public:
     friend class FileEngine;
     ~CitizenRepo() noexcept;
-
-    size_t addCitizen(const char* name, const Proffesion* ptr, 
-                    int happ, int money, int life,
-                    size_t lastCitOff, unsigned int id, 
-                    BuildingType bType, int currDay, int rent);
     
     int readCitizenAt(uint64_t offset, CitizenPack& out);
-    int removeCitizen(uint64_t offset, int currDay);
+    int removeCitizen(uint64_t lastResOffset, const char* targetName, int currDay);
     
-    int loadCitizens(std::ifstream& in, BuildingRepo& repo, int totalPeople);
-    int saveCitizens(std::ofstream& out);
+    BuildingPack& loadCitizens(std::ifstream& in, BuildingPack& building, int totalPeople);
+    int saveCitizens(std::ofstream& out,  uint64_t firstCitizenOffset);
 
+    //custom Forward Iterator allowing seamless iteration over ALIVE citizens 
+    //directly from the binary file without loading the entire population into RAM
     class Iterator
     {
     public:
@@ -47,6 +45,10 @@ public:
 private:
     CitizenRepo();
     CitizenRepo(CitizenRepo&&) noexcept;
+    uint64_t addCitizen(const char* name, const Proffesion* ptr, 
+                    int happ, int money, int life,
+                    uint64_t lastCitOff, unsigned int id, 
+                    BuildingType bType, int currDay, int rent);
 
     uint64_t encodeName(const char* str, size_t size);
     uint64_t encodeCitizen(CitizenPack& cit);

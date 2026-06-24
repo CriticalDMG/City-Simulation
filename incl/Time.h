@@ -8,6 +8,8 @@
 #include "helpers.h"
 #include "types.h"
 
+//singleton class responsible for managing the global simulation time
+//ensures all entities synchronize to a single chronological source of truth
 class Time
 {
 public:
@@ -44,6 +46,14 @@ public:
         return str;
     }
 
+    void syncWithSaveFile(std::time_t savedStartTime, int currentDay)
+    {
+        this->startTime = savedStartTime;
+        this->time = startTime + (currentDay * SINGLEDAY);
+    }
+
+    std::time_t getRawStartTime() const { return startTime; }
+
 private:
     Time();
     Time(const Time&) = delete;
@@ -52,6 +62,7 @@ private:
     std::time_t time;
     std::time_t startTime;
 };
+
 inline std::ostream& operator<<(std::ostream& os, const Time& t)
 {
     os << t.GetCurrentTime();

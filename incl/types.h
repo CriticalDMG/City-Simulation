@@ -4,9 +4,9 @@
 #include <ctime>
 
 #define STATS_COUNT 3
-#define CITY_SIG 0x43495459
-#define SINGLEDAY 86400LL
-#define FOOD 50
+#define CITY_SIG 0x43495459 //hex representation of 'CITY' in ASCII
+#define SINGLEDAY 86400LL   //number of seconds in a standard 24-hour day
+#define FOOD 50             //fixed daily food cost for all citizens
 
 using uint64_t = unsigned long long;
 
@@ -47,7 +47,7 @@ enum ProffType
 
 enum BuildingType
 {
-    BUILDIGNTYPE_UNKNOWN = -1,
+    BUILDINGTYPE_UNKNOWN = -1,
     
     MODERN,
     PANEL,
@@ -56,6 +56,7 @@ enum BuildingType
     TYPE_COUNTER
 };
 
+//holds statistical tracking data during time advancement steps
 struct StepStats
 {
     int removed{};
@@ -63,6 +64,7 @@ struct StepStats
     int broke{};
 };
 
+//aggregated simulation statistics for all living citizens
 struct CitizenStats
 {
     unsigned int happ{};
@@ -78,9 +80,19 @@ struct CitizenStats
     int max[STATS_COUNT]{}; // 0 - happ, 1 - money, 2 - life
 };
 
+//aggregated simulation statistics for all constructed buildings
 struct BuildingStats
 {
     int type[BuildingType::TYPE_COUNTER]{}; //0 - Modern, 1 - Panel, 2 - Dorm
+};
+
+struct Identificator
+{
+    uint64_t id{};
+    uint64_t fileOffset{};
+
+    unsigned int currLiving{};
+    unsigned int capacity{};
 };
 
 #pragma pack(push, 1)
@@ -90,45 +102,31 @@ struct BuildingStats
 
         unsigned short version{1};
         
-        unsigned char fileType{}; //0 - save file, 1 - citizens.bin file, 2 - names.bin, 3 - buildings.bin
+        unsigned char fileType{}; //0 - save file, 1 - config file
         
         FileSignature() {}
 
         FileSignature(unsigned char type): fileType{type} {};
     };
-
-    struct SaveHeader
-    {
-        FileSignature sig;
-
-        int day;
-
-        int rows;
-        int cols;
-
-        int citizenCount;
-        int buildingsCount;
-    };
-
     struct CitizenPack
     {
         unsigned int signature{CITY_SIG};
 
-        int startHapp :7 {};
-        int startLife :7 {};
-        int proff     :3 {};
-        int salary    :15{};
+        unsigned int startHapp :7 {};
+        unsigned int startLife :7 {};
+        unsigned int proff     :3 {};
+        unsigned int salary    :15{};
 
         int nameLen{};
         int startMoney{};
 
         int creationDay{};
-        int remDay{};
+        int remDay{}; //flags the exact day of death or -1 if the citizen is alive
 
         unsigned int buildingId{};
 
-        uint64_t prevCitOffset{};
-        uint64_t nameOffset{};
+        uint64_t prevCitOffset{}; //offset to the previously added citizen in the same building
+        uint64_t nameOffset{};    //offset to the actual string data in names.bin
     };
 
     struct BuildingPack
@@ -136,11 +134,11 @@ struct BuildingStats
         unsigned int signature{CITY_SIG};
         unsigned int id{};
 
-        int rent          :14{};
-        int maxCitCount   :14{};
-        int type          :4 {};
+        unsigned int rent          :14{};
+        unsigned int maxCitCount   :14{};
+        unsigned int type          :4 {};
 
-        uint64_t LastResOffset{};
+        uint64_t LastResOffset{}; //offset to the most recently added citizen in this building
     };
 
 #pragma pack(pop)

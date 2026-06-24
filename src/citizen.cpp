@@ -1,18 +1,15 @@
 #include "..\\incl\\citizen.h"
-#include "..\\Logger\\logger.h"
 #include "..\\incl\\helpers.h"
 #include <cstring>
 
 Citizen::Citizen(std::string name, const Proffesion* pr, 
                  int happiness, int life, unsigned int startMoney, 
                  int creationDay, unsigned int buildingId, BuildingType type)
-: proff(pr), name(std::move(name)), happ(happiness),
-  startHapp(happ), life(life), startLife(life), buildingId(buildingId),
-  salary(helpers::calcSalary(pr->minSalary(), pr->maxSalary())),
-  startMoney(startMoney), money(startMoney + salary), creationDay(creationDay)
+:proff(pr), name(std::move(name)), happ(happiness),
+startHapp(happ), life(life), startLife(life), buildingId(buildingId),
+salary(helpers::calcSalary(pr->minSalary(), pr->maxSalary())),
+startMoney(startMoney), money(startMoney + salary), creationDay(creationDay)
 {    
-    AUTO_LOG();
-
     if(this->name.empty() || this->name.length() == 0)
     {
         LOG_ERROR(ERROR_CODES::INVALID_CHARACTERISTICS);
@@ -32,12 +29,11 @@ Citizen::Citizen(std::string name, const Proffesion* pr,
     }
 }
 
-Citizen::Citizen(const CitizenPack& obj, 
-                    std::string name, const Proffesion* proff, int rent)
-: proff(proff), name(std::move(name)), happ(0),
-  startHapp(obj.startHapp), life(0), startLife(obj.startLife), buildingId(obj.buildingId),
-  salary(obj.salary), startMoney(startMoney), 
-  money(startMoney + salary), creationDay(obj.creationDay)
+Citizen::Citizen(const CitizenPack& obj, std::string name, const Proffesion* proff, int rent)
+:proff(proff), name(std::move(name)), happ(0),
+startHapp(obj.startHapp), life(0), startLife(obj.startLife), buildingId(obj.buildingId),
+salary(obj.salary), startMoney(obj.startMoney),     
+money(obj.startMoney + obj.salary), creationDay(obj.creationDay)
 {
     updateStatistics(Time::obj().GetDay(), rent);
 }
@@ -55,7 +51,7 @@ Citizen::operator CitizenPack() const
     pack.startMoney = startMoney;
 
     pack.creationDay = creationDay;
-    pack.remDay = -1;
+    pack.remDay = -1; //-1 acts as an 'Alive/Immortal' flag
 
     pack.buildingId = buildingId;
     
@@ -67,8 +63,6 @@ Citizen::operator CitizenPack() const
 
 void Citizen::updateStatistics(int currDay, int toPay)
 {
-    AUTO_LOG();
-
     int lived = currDay - creationDay;
 
     if(lived <= 0)
@@ -81,7 +75,11 @@ void Citizen::updateStatistics(int currDay, int toPay)
 
     int month = Time::obj().GetPassedMonths(creationDay, currDay);
 
-    long long virtualMoney = startMoney + month * GetSalary() - (month * toPay) - (lived * FOOD);
+    long long virtualMoney = (long long)startMoney + 
+                             ((long long)month * GetSalary()) - 
+                             ((long long)month * toPay) - 
+                             ((long long)lived * FOOD);
+                             
     long long deficit = 0;
 
     if(virtualMoney <= 0)
@@ -112,29 +110,6 @@ void Citizen::updateStatistics(int currDay, int toPay)
         happ = 0;
         money = 0;
     }
-}
-
-
-bool Citizen::operator==(const Citizen& oth) const
-{
-    return name == oth.name;
-}
-
-bool Citizen::operator!=(const Citizen& oth) const
-{
-    return !(*this == oth);
-}
-
-std::ostream& operator<<(std::ostream& os, const Citizen& s)
-{
-    AUTO_LOG();
-    os << "\n";
-    os << "Name: " << s.GetName() << "\n"
-       << "Life: " << s.GetLife() << "\n"
-       << "Happiness: " << s.happiness() << "\n"
-       << "Proffesion: " << helpers::ToProffession(s.proffesion()) << "\n"
-       << "Balance: " << s.balance() << "\n"; 
-    return os;
 }
 
 

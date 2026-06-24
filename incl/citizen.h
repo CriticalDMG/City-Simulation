@@ -11,10 +11,12 @@
 class Citizen
 {    
 public:
+
     Citizen(std::string name, const Proffesion* pr, 
                  int happiness, int life, unsigned int startMoney, 
                  int creationDay, unsigned int buildingId, BuildingType type);
 
+    //constructor used for deserializing citizens from binary packs
     explicit Citizen(const CitizenPack& obj, 
                      std::string name, 
                      const Proffesion* proff,
@@ -22,6 +24,7 @@ public:
 
     explicit operator CitizenPack() const;
 
+    //core economic simulation: recalculates current stats dynamically based on elapsed time
     void updateStatistics(int currDay, int rent);
 
     unsigned int GetSalary() const { return salary; }
@@ -38,9 +41,6 @@ public:
     ProffType proffesion() const  { return proff->GetProff(); }
 
     const std::string& GetName() const { return name; }
-
-    bool operator==(const Citizen& oth) const;
-    bool operator!=(const Citizen& oth) const;
 
 private:
     int getDayOfDeath(int rent) const;
@@ -63,5 +63,4 @@ private:
     int creationDay;
 };
 
-std::ostream& operator<<(std::ostream& os, const Citizen& s);
 #endif //CITIZEN_H

@@ -1,9 +1,10 @@
 #include "..\\incl\\CitizenRepo.h"
 #include "..\\incl\\citizen.h"
+#include <cstring>
 
 CitizenRepo::CitizenRepo()
-:citizens(CITIZEN_FILENAME, std::ios::in | std::ios::out | std::ios::trunc),
-names(NAMES_FILENAME, std::ios::in | std::ios::out | std::ios::trunc)
+:citizens(CITIZEN_FILENAME, std::ios::in | std::ios::out | std::ios::binary),
+names(NAMES_FILENAME, std::ios::in | std::ios::out | std::ios::binary)
 {
     if(!citizens.is_open() || !names.is_open())
     {
@@ -18,32 +19,14 @@ names(NAMES_FILENAME, std::ios::in | std::ios::out | std::ios::trunc)
 
 CitizenRepo::~CitizenRepo() noexcept
 {
-    if(citizens.is_open())
-    {
-        if(!citizens.good())
-        {
-            citizens.clear();
-            LOG_ERROR(ERROR_CODES::CITIZEN_FILE_CORRUPTED);
-        }
-
-        citizens.close();
-    }   
-
-    if(names.is_open())
-    {
-        if(!names.good())
-        {
-            names.clear();
-            LOG_ERROR(ERROR_CODES::NAMES_FILE_CORRUPTED);
-        }
-
-        names.close();
-    }   
+    citizens.close();
+    names.close();
 
     std::ofstream truncCitizens(CITIZEN_FILENAME, std::ios::trunc);
     std::ofstream truncNames(NAMES_FILENAME, std::ios::trunc);
 
     truncCitizens.close();
+    truncNames.close();
 }
 
 uint64_t CitizenRepo::addCitizen(const char* name, const Proffesion* ptr, 
@@ -95,102 +78,129 @@ int CitizenRepo::readCitizenAt(uint64_t offset, CitizenPack& out)
     return 1;
 }
 
-int CitizenRepo::removeCitizen(uint64_t offset, int currDay)
+int CitizenRepo::removeCitizen(uint64_t lastResOffset, const char* targetName, int currDay)
 {
-    if(!citizens.good()) 
+    if(!citizens.good()) citizens.clear();
+    if(!names.good()) names.clear();
+
+    uint64_t currOffset = lastResOffset;
+
+    while(currOffset != 0)
     {
-        citizens.clear();
-    }
-
-    CitizenPack pack;
-
-    citizens.seekg(offset, std::ios::end);
-
-    if(!citizens.read(reinterpret_cast<char*>(&pack), sizeof(pack)))
-    {
-        LOG_ERROR(ERROR_CODES::CITIZEN_FILE_CORRUPTED);
-        return 0;
-    }
-
-    if(pack.signature != CITY_SIG)
-    {
-        LOG_ERROR(ERROR_CODES::CITIZEN_DATA_CORRUPTED);
-        return 0;
-    }
-
-    if(pack.creationDay <= currDay && pack.remDay > currDay)
-    {
-        pack.remDay = currDay;
-        return 1;
-    }
-
-    return 0;
-}   
-
-int CitizenRepo::loadCitizens(std::ifstream& in, BuildingRepo& repo, int totalPeople)
-{
-    CitizenPack pack;
-
-    for(int i = 0; i < totalPeople; ++i)
-    {
-        if(!in.read(reinterpret_cast<char*>(&pack), sizeof(pack)))
+        CitizenPack pack;
+        
+        citizens.seekg(currOffset, std::ios::beg); 
+        
+        if(!citizens.read(reinterpret_cast<char*>(&pack), sizeof(pack)))
         {
-            LOG_ERROR(ERROR_CODES::SAVE_FILE_CORRUPTION);
+            LOG_ERROR(ERROR_CODES::CITIZEN_FILE_CORRUPTED);
             return 0;
         }
 
+        if(pack.signature != CITY_SIG)
+        {
+            LOG_ERROR(ERROR_CODES::CITIZEN_DATA_CORRUPTED);
+            return 0;
+        }
+
+        if((pack.creationDay <= currDay && (pack.remDay == -1 || currDay < pack.remDay)))
+        {
+            char buff[512];
+            names.seekg(pack.nameOffset, std::ios::beg);
+            names.read(buff, pack.nameLen);
+            buff[pack.nameLen] = '\0';
+            if(strcmp(buff, targetName) == 0)
+            {
+                pack.remDay = currDay;
+                
+                citizens.seekp(currOffset, std::ios::beg);
+                citizens.write(reinterpret_cast<const char*>(&pack), sizeof(pack));
+                
+                citizens.flush();
+                
+                return 1;
+            }
+        }
+
+        currOffset = pack.prevCitOffset;
+    }
+
+    return 0;
+}
+
+BuildingPack& CitizenRepo::loadCitizens(std::ifstream& in, BuildingPack& building, int totalPeople)
+{
+    building.LastResOffset = 0;
+    
+    struct TempCit 
+    {
+        CitizenPack pack;
+        std::string name;
+    };
+    
+    std::vector<TempCit> temp;
+
+    for(int i = 0; i < totalPeople; ++i)
+    {
+        CitizenPack pack;
+        if(!in.read(reinterpret_cast<char*>(&pack), sizeof(pack)))
+            throw (int)ERROR_CODES::SAVE_FILE_CORRUPTION;
+
         if(pack.signature == CITY_SIG)
         {
-            BuildingPack& building = repo.getBulding(pack.buildingId);
-            pack.prevCitOffset = building.LastResOffset;
-
             char buff[512];
             if(!in.read(reinterpret_cast<char*>(buff), pack.nameLen))
-            {   
-                LOG_ERROR(ERROR_CODES::SAVE_FILE_CORRUPTION);
-                return 0;
-            }
+                throw (int)ERROR_CODES::SAVE_FILE_CORRUPTION;
+            buff[pack.nameLen] = '\0';
 
-            pack.nameOffset = encodeName(buff, pack.nameLen);
-            uint64_t newCitOffset = encodeCitizen(pack);
-        
-            building.LastResOffset = newCitOffset;    
-            repo.saveChanges(building);
+            temp.push_back({pack, std::string(buff)});
         }   
     }
 
-    return 1;
+    for(int i = (int)temp.size() - 1; i >= 0; --i)
+    {
+        temp[i].pack.prevCitOffset = building.LastResOffset;
+        temp[i].pack.nameOffset = encodeName(temp[i].name.c_str(), temp[i].pack.nameLen);
+        building.LastResOffset = encodeCitizen(temp[i].pack);
+    }
+
+    return building;
 }
 
-int CitizenRepo::saveCitizens(std::ofstream& out)
+int CitizenRepo::saveCitizens(std::ofstream& out, uint64_t firstCitizenOffset)
 {
+    if (firstCitizenOffset == 0) return 0;
+
     citizens.clear();
     names.clear();
 
-    citizens.seekg(0, std::ios::beg);
+    int totalSaved = 0;
+
+    citizens.seekg(firstCitizenOffset, std::ios::beg);
     names.seekg(0, std::ios::beg);
 
     CitizenPack cit;
 
     while(citizens.read(reinterpret_cast<char*>(&cit), sizeof(cit)))
     {
-        if(cit.signature == CITY_SIG)
-        {
-            out.write(reinterpret_cast<const char*>(&cit), sizeof(cit));
-            
-            char buff[512];
-            names.seekg(cit.nameOffset, std::ios::beg);
+        if(cit.signature != CITY_SIG) return -1;
 
-            if(!names.read(buff, cit.nameLen))
-            {
-                return 0;
-            }
+        out.write(reinterpret_cast<const char*>(&cit), sizeof(cit));
+        char buff[512];
+        names.seekg(cit.nameOffset, std::ios::beg);
 
-            out.write(buff, cit.nameLen + 1);
-        }
-    }   
+        if(!names.read(buff, cit.nameLen)) return -1;
+        
+        out.write(buff, cit.nameLen);
+        ++totalSaved;
+        
+        uint64_t nextOffset = cit.prevCitOffset;
+        if(nextOffset == 0) break;
 
-    return 1;
+        citizens.seekg(nextOffset, std::ios::beg);
+    }
+
+    return totalSaved;
 }
 
 CitizenRepo::Iterator::Iterator(std::fstream& stream, int day, bool flag)
@@ -265,17 +275,18 @@ CitizenRepo::Iterator CitizenRepo::end()
 
 uint64_t CitizenRepo::encodeName(const char* str, size_t size)
 {
+    names.clear();
+    names.seekp(0, std::ios::end);
     uint64_t offset = names.tellp();
     names.write(str, size);
-
     return offset;
 }
 
 uint64_t CitizenRepo::encodeCitizen(CitizenPack& cit)
 {
+    citizens.clear();
+    citizens.seekp(0, std::ios::end);
     uint64_t offset = citizens.tellp();
     citizens.write(reinterpret_cast<char*>(&cit), sizeof(cit));
-
     return offset;
 }
-

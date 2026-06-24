@@ -5,6 +5,9 @@
 #include "BuildType.h"
 #include "building.h"
 
+//uses the Flyweight/Registry design pattern to avoid instantiating 
+//multiple identical objects for Professions and Building Types
+//provides shared, memory-efficient pointers to global behaviors
 class ProffRegister
 {
 public:

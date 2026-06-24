@@ -3,9 +3,11 @@
 #include <iostream>
 #include "types.h"
 
+//аbstract base class defining the polymorphic interface for all citizen professions
 class Proffesion
 {
 public:
+    //default implementations for stat changes. Overridden by specific professions if needed
     virtual int CalcHappiness(int happ, int monthsAdv) const { return happ; }
     virtual int CalcLife(int life, int monthsAdv) const { return life; }
 

@@ -6,7 +6,6 @@
 #include "types.h"
 #include "BuildType.h"
 #include "citizen.h"
-#include "..\\Logger\\logger.h"
 
 class Building
 {
@@ -21,28 +20,15 @@ public:
     BuildingType GetType() const { return type->GetType(); }
     unsigned int GetRent() const { return rent; }
 
-    const std::vector<Citizen>& GetPpl() const { return ppl; }
     unsigned int maxCitizens() const { return MaxCitCount; }
-
-    const Citizen& operator[](size_t index) const 
-    {
-        return ppl[index];
-    }
-
-    Citizen& operator[](size_t index) 
-    {
-        return ppl[index];
-    }
 
 private:
     unsigned int id;
     
     const BuildType* type;
+    //memory-optimized bit-fields to pack rent and capacity efficiently
     unsigned int rent           :16;
-
     unsigned int MaxCitCount    :16;
-    std::vector<Citizen> ppl;
 };
 
-std::ostream& operator<<(std::ostream& os, const Building& obj);
 #endif //BUILDING_H

@@ -1,17 +1,17 @@
-#include "..\\incl\\Time.h"
-#include "..\\incl\\CitizenRepo.h"
-#include "..\\incl\\Register.h"
-#include "..\\Logger\\logger.h"
+#include <iostream>
+#include <vector>
+#include <string>
+#include <ctime>
+#include <cstdlib>
+
+#include "..\\incl\\simulation.h"
 
 int main()
 {
-    ProffRegister reg;
-    CitizenRepo repo;
-    CitizenPack pack;
-    uint64_t offset = 0;
-    offset = repo.addCitizen("Pesho", reg.GetProff((ProffType)1), 10, 10, 10, 0, 1, (BuildingType)1, 1, 1500);
-    repo.readCitizenAt(offset, pack);
+    srand(static_cast<unsigned int>(time(NULL)));
 
-    std::cout << pack.salary << " " << pack.startHapp;
-    return EXIT_SUCCESS;
+    Simulation app;
+    app.run();
+
+    return 0;
 }

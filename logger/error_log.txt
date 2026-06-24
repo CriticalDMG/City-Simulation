@@ -1,1 +1,1 @@
-[2026-06-13 12:24:58] ERROR in ~CitizenRepo(Code: 1002) -> citizens.bin has file has been corrupted
+[2026-06-24 21:41:29] ERROR in addCitizenTo(Code: 3002) -> Duplicate citizen name in building

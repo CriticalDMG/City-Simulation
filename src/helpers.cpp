@@ -3,7 +3,7 @@
 
 void helpers::logError(ERROR_CODES::Type code, const char* func)
 {
-    std::ofstream os("..\\logger\\error_log.txt");
+    std::ofstream os("..\\logger\\error_log.txt", std::ios::app);
     if(!os.is_open()) return;
     std::time_t now = std::time(0);
     char timestamp[20];
